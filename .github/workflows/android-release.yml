@@ -1,0 +1,97 @@
+##################################################################################
+#         About
+##################################################################################
+# Reuseable workflow to be called from content repos. 
+# Creates a internal release in play console
+#
+##################################################################################
+
+name: Android - Release to Google Play
+  
+on:
+ workflow_call:
+  inputs:
+    APP_ID: 
+      type: string
+    CONTENT_BRANCH:
+      type: string
+      default: ""
+    LFS_USED:
+      type: boolean
+      default: false     
+    APP_CODE_BRANCH:
+      required: true
+      type: string
+    DEPLOYMENT_NAME:
+      required: true
+      type: string
+    PARENT_DEPLOYMENT_NAME:
+      type: string
+      default: ""
+    PARENT_DEPLOYMENT_REPO:
+      type: string
+      default: ""
+    PARENT_DEPLOYMENT_BRANCH:
+      type: string
+      default: ""
+    ENCRYPTED:
+      type: boolean
+      default: false
+
+
+  secrets:
+    DEPLOYMENT_PRIVATE_KEY:
+      required: false
+    GOOGLE_SERVICES_JSON: 
+      required: true
+    SIGNING_KEY: 
+      required: true
+    ALIAS: 
+      required: true
+    KEY_STORE_PASSWORD: 
+      required: true
+    KEY_PASSWORD: 
+      required: true    
+    GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:
+      required: true    
+
+  
+jobs:
+    build:
+      uses: ./.github/workflows/android-build.yml
+      with:
+        CONTENT_BRANCH: ${{ inputs.CONTENT_BRANCH }} 
+        LFS_USED: ${{ inputs.LFS_USED }} 
+        APP_CODE_BRANCH: ${{ inputs.APP_CODE_BRANCH }} 
+        DEPLOYMENT_NAME: ${{ inputs.DEPLOYMENT_NAME }} 
+        PARENT_DEPLOYMENT_NAME: ${{ inputs.PARENT_DEPLOYMENT_NAME }} 
+        PARENT_DEPLOYMENT_REPO: ${{ inputs.PARENT_DEPLOYMENT_REPO }} 
+        PARENT_DEPLOYMENT_BRANCH: ${{ inputs.PARENT_DEPLOYMENT_BRANCH }} 
+        ENCRYPTED: ${{ inputs.ENCRYPTED }} 
+      secrets:
+        DEPLOYMENT_PRIVATE_KEY: ${{ secrets.DEPLOYMENT_PRIVATE_KEY }}  
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}  
+        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}  
+        ALIAS: ${{ secrets.ALIAS }}  
+        KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}  
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}  
+      
+    release:
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+
+        - name: Download Build Artifact
+          id: download
+          uses: actions/download-artifact@v4
+          with:
+            name: release_bundle
+            path: ./
+  
+        - name: Upload to Google play
+          uses: r0adkll/upload-google-play@v1.1.2
+          with:
+            serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON}}
+            packageName: ${{inputs.APP_ID}}
+            releaseFiles: ${{steps.download.outputs.download-path}}/app-release.aab
+            track: internal
