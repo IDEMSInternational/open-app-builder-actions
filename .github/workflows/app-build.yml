@@ -88,7 +88,7 @@ jobs:
             
         - name: Populate Encryption key
           if: inputs.ENCRYPTED
-          run: echo "${{secrets.DEPLOYMENT_PRIVATE_KEY}}" > ./.idems_app/deployments/${{secrets.DEPLOYMENT_NAME}}/encrypted/private.key
+          run: echo "${{secrets.DEPLOYMENT_PRIVATE_KEY}}" > ./.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/encrypted/private.key
   
         - name: Setup Node
           uses: actions/setup-node@v4
