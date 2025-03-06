@@ -1,0 +1,153 @@
+##################################################################################
+#         About
+##################################################################################
+# Reuseable workflow to be called from content repos. 
+# Build and deploy app to firebase
+# Supports deploying to custom hosting channel for long-lived preview urls (30d)
+# Or using custom hosting target
+#
+#
+##################################################################################
+name: Deploy Web Preview
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "deploy_preview"
+  cancel-in-progress: true
+
+on:
+  workflow_call:
+    inputs:
+      FIREBASE_HOSTING_TARGET:
+        required: true
+        type: string
+      FIREBASE_PROJECT_ID:
+        required: true
+        type: string
+      FIREBASE_HOSTING_CHANNEL:
+        required: true
+        type: string     
+      BUILD_FLAGS:
+        type: string
+        default: ""
+      CONTENT_BRANCH:
+        type: string
+        default: ""
+      LFS_USED:
+        required: true
+        type: boolean  
+      APP_CODE_BRANCH:
+        required: true
+        type: string
+      DEPLOYMENT_NAME:
+        required: true
+        type: string
+      PARENT_DEPLOYMENT_NAME:
+        type: string
+        default: ""
+      PARENT_DEPLOYMENT_REPO:
+        type: string
+        default: ""
+      PARENT_DEPLOYMENT_BRANCH:
+        type: string
+        default: ""
+      ENCRYPTED:
+        required: true
+        type: boolean  
+    secrets:
+      DEPLOYMENT_PRIVATE_KEY:
+        required: false      
+      FIREBASE_SERVICE_ACCOUNT:
+        required: true
+
+jobs:
+  build_action:
+    uses: ./.github/workflows/app-build.yml
+    with:
+      CONTENT_BRANCH: ${{ inputs.CONTENT_BRANCH }}   
+      LFS_USED: ${{ inputs.LFS_USED }}  
+      APP_CODE_BRANCH: ${{ inputs.APP_CODE_BRANCH }}  
+      DEPLOYMENT_NAME: ${{ inputs.DEPLOYMENT_NAME }}  
+      PARENT_DEPLOYMENT_NAME: ${{ inputs.PARENT_DEPLOYMENT_NAME }}  
+      PARENT_DEPLOYMENT_REPO: ${{ inputs.PARENT_DEPLOYMENT_REPO }}  
+      PARENT_DEPLOYMENT_BRANCH: ${{ inputs.PARENT_DEPLOYMENT_BRANCH }}  
+      ENCRYPTED: ${{ inputs.ENCRYPTED }}            
+    secrets: 
+      DEPLOYMENT_PRIVATE_KEY: ${{ secrets.DEPLOYMENT_PRIVATE_KEY }}  
+
+    # TODO - split post_build and deploy
+  deploy:
+    needs: build_action
+    runs-on: ubuntu-latest
+    outputs:
+      urls: ${{ steps.deploy.outputs.urls }}
+    steps:
+      # Extract build artifact
+      - uses: actions/checkout@v3
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: www
+
+      - name: Extract Build folder
+        run: |
+          mkdir www
+          tar -xf artifact.tar --directory www
+
+      # TODO - use templated files
+      # Create a .firebaserc file mapping any firebase deployment host targets (required if multi-host projects)
+      # e.g. {"projects": {"default": "my_app"},"targets": {"my_app": {"hosting": {"my_app_dev":["my_app_dev"]} } }
+      - name: Populate Firebase Targets
+        run: |
+          FIREBASE_RC_TARGETS=$(jq -n \
+            --argjson "${{inputs.FIREBASE_PROJECT_ID}}" \
+            '{"hosting":{"${{inputs.FIREBASE_HOSTING_TARGET}}":["${{inputs.FIREBASE_HOSTING_TARGET}}"]}}' \
+            '$ARGS.named'
+            )
+          FIREBASE_RC=$(jq -n \
+          --argjson projects '{"default":"${{inputs.FIREBASE_PROJECT_ID}}"}' \
+          --argjson targets "$FIREBASE_RC_TARGETS" \
+          '$ARGS.named'
+          )
+          echo $FIREBASE_RC | jq '.'
+          echo $FIREBASE_RC > .firebaserc
+
+      # Create a firebase.json file to handle single-page-app hosting redirects
+      # e.g. {"hosting": [{"target": "app","public": "www","ignore": ["firebase.json"], "rewrites": [{"source": "**","destination": "/index.html"}] }]}
+      - name: Populate Firebase JSON
+        run: |
+          FIREBASE_JSON_HOSTING=$(jq -n \
+          --arg target "${{inputs.FIREBASE_HOSTING_TARGET}}" \
+          --arg public "www" \
+          --argjson ignore '["firebase.json"]' \
+          --argjson rewrites '[{"source": "**","destination": "/index.html"}]' \
+          '$ARGS.named'
+          )
+          FIREBASE_JSON=$(jq -n \
+          --argjson hosting "[$FIREBASE_JSON_HOSTING]" \
+          '$ARGS.named'
+          )
+          echo $FIREBASE_JSON | jq '.'
+          echo $FIREBASE_JSON > firebase.json
+
+      # Deploy to firebase
+      - id: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          projectId: "${{ inputs.FIREBASE_PROJECT_ID }}"
+          channelId: "${{ inputs.FIREBASE_HOSTING_CHANNEL }}"
+          target: "${{inputs.FIREBASE_HOSTING_TARGET}}"
+          expires: "30d"
+##################################################################################
+#         Useful Links
+##################################################################################
+# https://firebase.google.com/docs/hosting/full-config
+# https://firebase.google.com/docs/cli/targets
+
+# https://www.baeldung.com/linux/jq-command-json
+# https://jqlang.github.io/jq/manual/
+# https://jqplay.org/
+
+# echo $FIREBASE_JSON | jq '.hosting[0]'
