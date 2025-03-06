@@ -17,8 +17,8 @@ on:
       type: string
       default: ""
     LFS_USED:
-      type: boolean
-      default: false     
+      required: true
+      type: boolean  
     APP_CODE_BRANCH:
       required: true
       type: string
@@ -35,8 +35,8 @@ on:
       type: string
       default: ""
     ENCRYPTED:
-      type: boolean
-      default: false
+      required: true
+      type: boolean  
 
 
   secrets:
