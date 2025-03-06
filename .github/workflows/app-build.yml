@@ -118,7 +118,7 @@ jobs:
             key: ${{ runner.os }}-node-modules-yarn-v1-${{ hashFiles('yarn.lock') }}
     
         - name: Set deployment
-          run: yarn workflow deployment set $DEPLOYMENT_NAME --skip-refresh
+          run: yarn workflow deployment set ${{inputs.DEPLOYMENT_NAME}} --skip-refresh
 
         - name: Build
           run: yarn build ${{inputs.BUILD_FLAGS}}
