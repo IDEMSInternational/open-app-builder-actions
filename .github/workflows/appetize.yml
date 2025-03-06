@@ -1,0 +1,117 @@
+###################################################################################
+#         About
+##################################################################################
+# Reuseable workflow to be called from content repos. 
+# Appetize.io for labelled PRs
+# Specifies deployment target based on pr target branch
+# Must specify all below secrets and variables - see documentation for details
+##################################################################################
+
+name: Test Appetize
+concurrency:
+  group: test-appetize-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+on:
+  workflow_call:
+    inputs:
+      APP_ID: 
+        type: string
+      CONTENT_BRANCH:
+        type: string
+        default: ""
+      LFS_USED:
+        type: boolean
+        default: false     
+      APP_CODE_BRANCH:
+        required: true
+        type: string
+      DEPLOYMENT_NAME:
+        required: true
+        type: string
+      PARENT_DEPLOYMENT_NAME:
+        type: string
+        default: ""
+      PARENT_DEPLOYMENT_REPO:
+        type: string
+        default: ""
+      PARENT_DEPLOYMENT_BRANCH:
+        type: string
+        default: ""
+      ENCRYPTED:
+        type: boolean
+        default: false 
+    secrets:
+      DEPLOYMENT_PRIVATE_KEY:
+        required: false
+      GOOGLE_SERVICES_JSON: 
+        required: true
+      SIGNING_KEY: 
+        required: true
+      ALIAS: 
+        required: true
+      KEY_STORE_PASSWORD: 
+        required: true
+      KEY_PASSWORD: 
+        required: true    
+      GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:
+        required: true    
+      APPETIZE_TOKEN:
+        required: true   
+      APPETIZE_APP_KEY: 
+        required: true   
+
+jobs:
+
+  build:
+      if: contains(github.event.pull_request.labels.*.name, 'Test - appetize')
+      uses: ./.github/workflows/android-build.yml
+      with:
+        CONTENT_BRANCH: ${{ github.base_ref }}   
+        LFS_USED: ${{ inputs.LFS_USED }} 
+        APP_CODE_BRANCH: ${{ inputs.APP_CODE_BRANCH }} 
+        DEPLOYMENT_NAME: ${{ inputs.DEPLOYMENT_NAME }} 
+        PARENT_DEPLOYMENT_NAME: ${{ inputs.PARENT_DEPLOYMENT_NAME }} 
+        PARENT_DEPLOYMENT_REPO: ${{ inputs.PARENT_DEPLOYMENT_REPO }} 
+        PARENT_DEPLOYMENT_BRANCH: ${{ inputs.PARENT_DEPLOYMENT_BRANCH }} 
+        ENCRYPTED: ${{ inputs.ENCRYPTED }} 
+      secrets:
+        DEPLOYMENT_PRIVATE_KEY: ${{ secrets.DEPLOYMENT_PRIVATE_KEY }}  
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}  
+        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}  
+        ALIAS: ${{ secrets.ALIAS }}  
+        KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}  
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}  
+   
+  test_appetize:
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      urls: ${{ steps.deploy.outputs.urls }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: debug_apk
+          path: ./
+
+      - name: Upload to Appetize.io
+        id: upload
+        uses: maxep/appetize-upload-action@0.1.0
+        with:
+          api-token: ${{ secrets.APPETIZE_TOKEN }}
+          file-path: ${{ steps.download.outputs.download-path }}/app-debug.apk
+          platform: "android"
+          timeout: 30
+          # Include to overwrite existing app instead of creating new (will only allow single build at a time)
+          public-key: ${{secrets.APPETIZE_APP_KEY}}
+          
+      - name: "Post to PR"
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            **Android Appetize URL**
+            ${{ steps.upload.outputs.APPETIZE_APP_URL }}?device=pixel4&osVersion=12.0&scale=75
