@@ -123,7 +123,7 @@ jobs:
           run: yarn install --immutable
   
         - name: Set deployment
-          run: yarn workflow deployment set $DEPLOYMENT_NAME --skip-refresh
+          run: yarn workflow deployment set ${{inputs.DEPLOYMENT_NAME}} --skip-refresh
   
         - name: Prepare android configuration
           run: yarn workflow android
