@@ -113,9 +113,11 @@ jobs:
       working-directory: idems_translation
       run: python app/scripts/prepare_for_translation.py ../open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translator_settings.json
 
-    - name: Move files
+    - name: Move files (overwrite conflicts, remove sources)
       run: |
-        rsync -a --remove-source-files --remove-source-dirs idems_translation/app/3_ready_for_translators/ plh-digital-content/translations/
+        rsync -a --remove-source-files idems_translation/app/3_ready_for_translators/ plh-digital-content/translations/
+        find idems_translation/app/3_ready_for_translators/ -type d -empty -delete
+    
 
     - name: Commit changes
       working-directory: plh-digital-content
