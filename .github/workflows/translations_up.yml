@@ -115,7 +115,7 @@ jobs:
 
     - name: Move files
       run: |
-        mv -f, --force idems_translation/app/3_ready_for_translators/* plh-digital-content/translations/ 
+        rsync -a --remove-source-files --remove-source-dirs idems_translation/app/3_ready_for_translators/ plh-digital-content/translations/
 
     - name: Commit changes
       working-directory: plh-digital-content
