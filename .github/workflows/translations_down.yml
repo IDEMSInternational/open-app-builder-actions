@@ -132,10 +132,11 @@ jobs:
           # Loop through languages and move files
           for lang in $(echo "${LANGUAGES}" | jq -r 'keys[]'); do
             destination=$(echo "${LANGUAGES}" | jq -r ".[\"$lang\"]")
-            mv idems_translation/app/5_completed_dictionaries/${lang}_dictionary.json open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translations_source/translated_strings/translated.${destination}.json
+            target_dir="open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translations_source/translated_strings"
+            mkdir -p "$target_dir"
+            mv "idems_translation/app/5_completed_dictionaries/${lang}_dictionary.json" "$target_dir/translated.${destination}.json"
           done
       
-
 
       - name: Setup Node
         uses: actions/setup-node@v4
