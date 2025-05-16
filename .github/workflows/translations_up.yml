@@ -7,24 +7,8 @@
 # Get Translation content repo
 # run script to post translations
 ##################################################################################
-#         Configuration 
-##################################################################################
-env:
-  DEPLOYMENT_NAME: ${{vars.DEPLOYMENT_NAME}}
-  APP_CODE_BRANCH: ${{vars.APP_CODE_BRANCH}}
-  PARENT_DEPLOYMENT_REPO: ${{vars.PARENT_DEPLOYMENT_REPO}}
-  PARENT_DEPLOYMENT_NAME: ${{vars.PARENT_DEPLOYMENT_NAME}}
-  PARENT_DEPLOYMENT_BRANCH: ${{vars.PARENT_DEPLOYMENT_BRANCH}}
-  DEPLOYMENT_PRIVATE_KEY: ${{secrets.DEPLOYMENT_PRIVATE_KEY}}
-  FIREBASE_CONFIG: ${{secrets.FIREBASE_CONFIG}}  
-  GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }} 
-  GDRIVE_TOKEN:  ${{ secrets.GDRIVE_TOKEN }}
-
 
 name: Update central Translations and create a PR
-##################################################################################
-#         Main Code
-##################################################################################
 on:
   workflow_call:
     inputs:
@@ -96,7 +80,7 @@ jobs:
 
 
     - name: Checkout parent repo if needed
-      if: env.PARENT_DEPLOYMENT_REPO != ''
+      if: inputs.PARENT_DEPLOYMENT_REPO != ''
       uses: actions/checkout@v3
       with:
         path: "open-app-builder/.idems_app/deployments/${{inputs.PARENT_DEPLOYMENT_NAME}}"
