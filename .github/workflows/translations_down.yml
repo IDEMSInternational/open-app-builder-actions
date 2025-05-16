@@ -121,7 +121,7 @@ jobs:
         
       - name: Run script to create translation files
         working-directory: idems_translation
-        run: python app/scripts/merge_files_post_translation.py ../parenting-app-ui/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translator_settings.json
+        run: python app/scripts/merge_files_post_translation.py ../.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translator_settings.json
 
       
       - name: Move and rename translation file
@@ -130,7 +130,7 @@ jobs:
           # Loop through languages and move files
           for lang in $(echo "${LANGUAGES}" | jq -r 'keys[]'); do
             destination=$(echo "${LANGUAGES}" | jq -r ".[\"$lang\"]")
-            mv idems_translation/app/5_completed_dictionaries/${lang}_dictionary.json parenting-app-ui/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translations_source/translated_strings/translated.${destination}.json
+            mv idems_translation/app/5_completed_dictionaries/${lang}_dictionary.json ../.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translations_source/translated_strings/translated.${destination}.json
           done
       
 
