@@ -173,12 +173,15 @@ jobs:
         run: yarn workflow deployment set ${{inputs.DEPLOYMENT_NAME}} --skip-refresh
           
       - name: Add google credentials
+        working-directory: open-app-builder
         run: |
-          echo "${{secrets.GDRIVE_CREDENTIALS}}" > open-app-builder/packages/scripts/config/credentials.json
+          echo "${{secrets.GDRIVE_CREDENTIALS}}" > ./packages/scripts/config/credentials.json
     
       - name: Add google token
-        run: |
-          echo "${{ secrets.GDRIVE_TOKEN }}" > open-app-builder/packages/scripts/config/token.json
+        working-directory: open-app-builder
+        run: echo "$GDRIVE_TOKEN" > ./packages/scripts/config/token.json
+        env:
+          GDRIVE_TOKEN: ${{ secrets.GDRIVE_TOKEN }}    
 
 
       - name: Sync content
