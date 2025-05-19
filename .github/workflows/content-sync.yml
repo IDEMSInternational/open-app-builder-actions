@@ -9,6 +9,11 @@
 #         Version : 1.0
 #
 ##################################################################################
+env:
+  DEPLOYMENT_PRIVATE_KEY: ${{ secrets.DEPLOYMENT_PRIVATE_KEY }} 
+  GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }} 
+  GDRIVE_TOKEN:  ${{ secrets.GDRIVE_TOKEN }}
+  PAT: ${{ secrets.PAT }}
 
   
 name: Perform content sync and create a PR
