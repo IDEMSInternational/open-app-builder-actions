@@ -209,6 +209,7 @@ jobs:
         #  git checkout -b automated-changes
 
       - name: Debug Git Remotes
+        working-directory: open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}
         run: git remote -v
 
       - name: Create Pull Request
