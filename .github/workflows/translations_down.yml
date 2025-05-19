@@ -4,6 +4,13 @@
 #         
 #
 ##################################################################################
+env:
+  DEPLOYMENT_PRIVATE_KEY: ${{ secrets.DEPLOYMENT_PRIVATE_KEY }} 
+  GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }} 
+  GDRIVE_TOKEN:  ${{ secrets.GDRIVE_TOKEN }}
+  PAT: ${{ secrets.PAT }}
+## Above should not be needed however cannot perform content sync if GDRIVE secrets are
+## not passed this way
 
 name: Download central translations and create a PR
 on:
@@ -116,14 +123,6 @@ jobs:
         if: inputs.ENCRYPTED
         run: echo "${{secrets.DEPLOYMENT_PRIVATE_KEY}}" > open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/encrypted/private.key
 
-      - name: Add google credentials
-        run: |
-          echo "${{secrets.GDRIVE_CREDENTIALS}}" > open-app-builder/packages/scripts/config/credentials.json
-    
-      - name: Add google token
-        run: echo "$GDRIVE_TOKEN" > open-app-builder/packages/scripts/config/token.json
-        env:
-          GDRIVE_TOKEN: ${{ secrets.GDRIVE_TOKEN }}    
 
 
       - name: List contents of current directory
@@ -181,6 +180,16 @@ jobs:
       - name: Set deployment
         working-directory: open-app-builder
         run: yarn workflow deployment set ${{inputs.DEPLOYMENT_NAME}} --skip-refresh
+
+      - name: Add google credentials
+        run: |
+          echo "${{secrets.GDRIVE_CREDENTIALS}}" > open-app-builder/packages/scripts/config/credentials.json
+    
+      - name: Add google token
+        run: echo "$GDRIVE_TOKEN" > open-app-builder/packages/scripts/config/token.json
+        env:
+          GDRIVE_TOKEN: ${{ secrets.GDRIVE_TOKEN }}    
+
 
       - name: Sync content
         working-directory: open-app-builder

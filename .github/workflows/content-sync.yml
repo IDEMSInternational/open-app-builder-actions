@@ -14,7 +14,8 @@ env:
   GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }} 
   GDRIVE_TOKEN:  ${{ secrets.GDRIVE_TOKEN }}
   PAT: ${{ secrets.PAT }}
-
+## Above should not be needed however cannot perform content sync if GDRIVE secrets are
+## not passed this way
   
 name: Perform content sync and create a PR
 on:
