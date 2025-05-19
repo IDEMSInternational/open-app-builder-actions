@@ -130,21 +130,21 @@ jobs:
 
 
         
-#      - name: Run script to create translation files
-#        working-directory: idems_translation
-#        run: python app/scripts/merge_files_post_translation.py ../open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translator_settings.json
+      - name: Run script to create translation files
+        working-directory: idems_translation
+        run: python app/scripts/merge_files_post_translation.py ../open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translator_settings.json
 
       
-#      - name: Move and rename translation file
-#        run: |
-#          LANGUAGES=$(cat open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/language_mappings.json)
-#          # Loop through languages and move files
-#          for lang in $(echo "${LANGUAGES}" | jq -r 'keys[]'); do
-#            destination=$(echo "${LANGUAGES}" | jq -r ".[\"$lang\"]")
-#            target_dir="open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translations_source/translated_strings"
-#            mkdir -p "$target_dir"
-#            mv "idems_translation/app/5_completed_dictionaries/${lang}_dictionary.json" "$target_dir/translated.${destination}.json"
-#          done
+      - name: Move and rename translation file
+        run: |
+          LANGUAGES=$(cat open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/language_mappings.json)
+          # Loop through languages and move files
+          for lang in $(echo "${LANGUAGES}" | jq -r 'keys[]'); do
+            destination=$(echo "${LANGUAGES}" | jq -r ".[\"$lang\"]")
+            target_dir="open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/translations_source/translated_strings"
+            mkdir -p "$target_dir"
+            mv "idems_translation/app/5_completed_dictionaries/${lang}_dictionary.json" "$target_dir/translated.${destination}.json"
+          done
       
 
       - name: Setup Node
@@ -207,6 +207,9 @@ jobs:
           git add .  # This adds all changes to the staging area
           git diff --quiet && git diff --staged --quiet || git commit -m "Automated commit message" # Only commit if there are changes
         #  git checkout -b automated-changes
+
+      - name: Debug Git Remotes
+        run: git remote -v
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7.0.5
