@@ -35,6 +35,9 @@ on:
       PARENT_DEPLOYMENT_BRANCH:
         type: string
         default: ""
+      TRANSLATION_REPO:
+        type: string
+        default: "IDEMSInternational/plh-digital-content.git"
     secrets:
       PAT:
         required: true
@@ -44,12 +47,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Check translation repo   #TODO this repo should be a variable
+    - name: Check translation repo   
       uses: actions/checkout@v3
       with:
         token: ${{ secrets.PAT }}
-        repository: "IDEMSInternational/plh-digital-content.git"
-        path: "plh-digital-content"
+        repository: ${{inputs.TRANSLATION_REPO}}
+        path: "translation_repo"
         ref: "main"
 
     - name: Check idems_translation
@@ -99,12 +102,12 @@ jobs:
 
     - name: Move files (overwrite conflicts, remove sources)
       run: |
-        rsync -a --remove-source-files idems_translation/app/3_ready_for_translators/ plh-digital-content/translations/
+        rsync -a --remove-source-files idems_translation/app/3_ready_for_translators/ translation_repo/translations/
         find idems_translation/app/3_ready_for_translators/ -type d -empty -delete
     
 
     - name: Commit changes
-      working-directory: plh-digital-content
+      working-directory: translation_repo
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"        
@@ -117,7 +120,7 @@ jobs:
       with:
         token: ${{ secrets.PAT }}
         # Relative path under $GITHUB_WORKSPACE to the repository. Defaults to $GITHUB_WORKSPACE.
-        path: plh-digital-content            
+        path: translation_repo
         # The title of the pull request.
         title: ${{ inputs.pr-title }}
         # The body of the pull request.
