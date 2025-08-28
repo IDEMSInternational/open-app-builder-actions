@@ -45,6 +45,9 @@ on:
       ENCRYPTED:
         required: true
         type: boolean  
+      TRANSLATION_REPO:
+        type: string
+        default: "IDEMSInternational/plh-digital-content.git"
     secrets:
       DEPLOYMENT_PRIVATE_KEY:
         required: false
@@ -60,11 +63,11 @@ jobs:
       runs-on: ubuntu-latest
       steps:
 
-      - name: Check translation repo   #TODO this repo should be a variable
+      - name: Check translation repo   
         uses: actions/checkout@v3
         with:
-          repository: "IDEMSInternational/plh-digital-content.git"
-          path: "plh-digital-content"
+          repository: ${{inputs.TRANSLATION_REPO}}
+          path: "translation_repo"
           ref: "main"
 
       - name: Check idems_translation
