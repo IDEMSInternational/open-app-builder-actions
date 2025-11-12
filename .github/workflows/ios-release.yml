@@ -214,7 +214,7 @@ jobs:
 
       - name: Configure iOS
         run: |
-          echo ${{secrets.GOOGLE_SERVICES_PLIST}} > ios/App/App/GoogleService-Info.plist
+          echo "$GOOGLE_SERVICES_PLIST" > ios/App/App/GoogleService-Info.plist
           yarn workflow ios configure
           npx cap sync ios
 
