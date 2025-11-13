@@ -148,6 +148,7 @@ jobs:
   #############################################################################
 
   build_ios:
+    name: Build iOS and Release to ${{ inputs.target }}
     runs-on: macos-latest
     needs: build_web
     steps:
@@ -238,8 +239,8 @@ jobs:
           cache: yarn
       - run: yarn workspaces focus frontend --production
 
-      # Setup certs, build and upload to testflight
-      - name: Build IOS and Release
+      # Setup certs, build and upload to target (testflight or appetize)
+      - name: Build IOS and Release to ${{ inputs.target }}
         working-directory: ios/App
         # Call workflow from generated fastfile
         run: bundle exec fastlane release_${{ inputs.target }}
