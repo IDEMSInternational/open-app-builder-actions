@@ -108,9 +108,9 @@ jobs:
         # Setup node same way as web build to allow calling `npx cap sync` command
         #############################################################################
         - name: Setup Node
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v6
           with:
-            node-version: 20.17.0          
+            node-version: 24.13.0
         - uses: actions/cache/restore@v3
           id: cache
           with:
