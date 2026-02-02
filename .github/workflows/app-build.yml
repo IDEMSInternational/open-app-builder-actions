@@ -91,9 +91,9 @@ jobs:
           run: echo "${{secrets.DEPLOYMENT_PRIVATE_KEY}}" > ./.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}/encrypted/private.key
   
         - name: Setup Node
-          uses: actions/setup-node@v4
+          uses: actions/setup-node@v6
           with:
-            node-version: 20.17.0
+            node-version: 24.13.0
 
   
       #############################################################################
