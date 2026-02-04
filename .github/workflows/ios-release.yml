@@ -149,7 +149,7 @@ jobs:
 
   build_ios:
     name: Build iOS and Release to ${{ inputs.target }}
-    runs-on: macos-latest
+    runs-on: macos-26
     needs: build_web
     steps:
       # Checkout builder repo and install node_modules so that they can be used in ios build
