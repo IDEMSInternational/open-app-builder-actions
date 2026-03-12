@@ -224,7 +224,7 @@ jobs:
 
       - name: Configure iOS
         run: |
-          yarn workflow ios configure
+          yarn workflow ios
           npx cap sync ios
 
       # Setup ruby. Use bundler-cache to auto-install Gemfile in working directory
