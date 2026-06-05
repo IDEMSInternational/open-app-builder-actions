@@ -14,11 +14,11 @@ on:
       allow_provisioning_changes:
         description: "Allow Fastlane to create or update provisioning profiles"
         required: true
-        default: "true"
+        default: "false"
         type: choice
         options:
-          - "true"
           - "false"
+          - "true"
 
 jobs:
   call_get_vars:

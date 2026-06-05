@@ -72,7 +72,7 @@ on:
         required: true
         type: boolean
       allow_provisioning_changes:
-        default: true
+        default: false
         type: boolean
     secrets:
       DEPLOYMENT_PRIVATE_KEY:

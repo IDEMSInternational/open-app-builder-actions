@@ -134,11 +134,11 @@ on:
       allow_provisioning_changes:
         description: "Allow Fastlane to create or update provisioning profiles"
         required: true
-        default: "true"
+        default: "false"
         type: choice
         options:
-          - "true"
           - "false"
+          - "true"
 
 jobs:
   ios_build:
@@ -157,11 +157,11 @@ jobs:
 
 Trigger the workflow manually from the deployment repo.  
 Choose either `appetize` or `testflight` as the target.
-Leave `allow_provisioning_changes` set to `true` unless you need Fastlane Match to run in readonly mode.
+Leave `allow_provisioning_changes` set to `false` for repeatable readonly signing, unless you intentionally need Fastlane Match to create or update provisioning profiles.
 
 - `appetize` → builds an unsigned simulator `.app` and uploads to Appetize.io  
 - `testflight` → builds a signed `.ipa` and uploads to TestFlight  
-- `allow_provisioning_changes=false` → tells Fastlane not to create or update provisioning profiles  
+- `allow_provisioning_changes=true` → allows Fastlane to create or update provisioning profiles  
 
 ---
 
