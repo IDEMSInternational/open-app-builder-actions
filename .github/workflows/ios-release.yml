@@ -71,6 +71,9 @@ on:
       ENCRYPTED:
         required: true
         type: boolean
+      allow_provisioning_changes:
+        default: true
+        type: boolean
     secrets:
       DEPLOYMENT_PRIVATE_KEY:
         description: Provide private key if deployment uses encrypted config
@@ -246,6 +249,8 @@ jobs:
         working-directory: ios/App
         # Call workflow from generated fastfile
         run: bundle exec fastlane release_${{ inputs.target }}
+        env:
+          ALLOW_PROVISIONING_CHANGES: ${{ inputs.allow_provisioning_changes }}
 
       # Upload logs if the job fails
       - name: Upload Xcode build logs
