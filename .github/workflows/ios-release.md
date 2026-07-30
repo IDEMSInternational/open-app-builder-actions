@@ -131,6 +131,14 @@ on:
         options:
           - appetize
           - testflight
+      allow_provisioning_changes:
+        description: "Allow Fastlane to create or update provisioning profiles"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 jobs:
   ios_build:
@@ -138,6 +146,7 @@ jobs:
     uses: IDEMSInternational/open-app-builder-actions/.github/workflows/ios-release.yml@main
     with:
       target: ${{ github.event.inputs.target }} # "appetize" or "testflight"
+      allow_provisioning_changes: ${{ github.event.inputs.allow_provisioning_changes == 'true' }}
     secrets: inherit
     # NB: secrets will need to passed explicitly if content repo is under a different org. See ../content_repository_actions/ios-release.yml for real world example
 ```
@@ -148,9 +157,11 @@ jobs:
 
 Trigger the workflow manually from the deployment repo.  
 Choose either `appetize` or `testflight` as the target.
+Leave `allow_provisioning_changes` set to `false` for repeatable readonly signing, unless you intentionally need Fastlane Match to create or update provisioning profiles.
 
 - `appetize` → builds an unsigned simulator `.app` and uploads to Appetize.io  
 - `testflight` → builds a signed `.ipa` and uploads to TestFlight  
+- `allow_provisioning_changes=true` → allows Fastlane to create or update provisioning profiles  
 
 ---
 
