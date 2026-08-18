@@ -90,10 +90,10 @@ jobs:
     outputs:
       urls: ${{ steps.deploy.outputs.urls }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Download Build Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: debug_apk
           path: ./
@@ -110,7 +110,7 @@ jobs:
           public-key: ${{secrets.APPETIZE_APP_KEY}}
           
       - name: "Post to PR"
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           message: |
             **Android Appetize URL**

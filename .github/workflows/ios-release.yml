@@ -170,14 +170,14 @@ jobs:
 
       # Checkout builder repo and install node_modules so that they can be used in ios build
       # (e.g. capacitor plugins store podfiles in node_modules)
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: "IDEMSInternational/open-app-builder.git"
           ref: ${{inputs.APP_CODE_BRANCH}}
 
       - name: Checkout parent repo if needed
         if: inputs.PARENT_DEPLOYMENT_REPO != ''
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: ".idems_app/deployments/${{inputs.PARENT_DEPLOYMENT_NAME}}"
           repository: ${{inputs.PARENT_DEPLOYMENT_REPO}}
@@ -185,7 +185,7 @@ jobs:
           lfs: false
 
       - name: Checkout deployment
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{inputs.CONTENT_BRANCH}}
           path: ".idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}"
@@ -201,7 +201,7 @@ jobs:
         with:
           node-version: 24.13.0
 
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@v5
         id: cache
         with:
           path: ./.yarn/cache
@@ -210,7 +210,7 @@ jobs:
             ${{ runner.os }}-node-modules-yarn-v1-
       - name: Install node modules
         run: yarn install --immutable
-      - uses: actions/cache/save@v4
+      - uses: actions/cache/save@v5
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           path: ./.yarn/cache
@@ -220,7 +220,7 @@ jobs:
         run: yarn workflow deployment set ${{inputs.DEPLOYMENT_NAME}} --skip-refresh
 
       - name: Download www artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: www
 
@@ -272,7 +272,7 @@ jobs:
       # Upload logs if the job fails
       - name: Upload Xcode build logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: xcode-build-logs
           path: ~/Library/Logs/gym

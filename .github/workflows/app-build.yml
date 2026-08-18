@@ -62,14 +62,14 @@ jobs:
 
       steps:
         - name: Check out app code
-          uses: actions/checkout@v4
+          uses: actions/checkout@v5
           with:
             repository: "IDEMSInternational/open-app-builder.git"
             ref: ${{inputs.APP_CODE_BRANCH}}
   
         - name: Checkout parent repo if needed
           if: inputs.PARENT_DEPLOYMENT_REPO != ''
-          uses: actions/checkout@v4
+          uses: actions/checkout@v5
           with:
             path: ".idems_app/deployments/${{inputs.PARENT_DEPLOYMENT_NAME}}"
             repository: ${{inputs.PARENT_DEPLOYMENT_REPO}}
@@ -78,7 +78,7 @@ jobs:
             lfs: false
   
         - name: Checkout deployment
-          uses: actions/checkout@v4
+          uses: actions/checkout@v5
           with:
             ref: ${{inputs.CONTENT_BRANCH}}
             path: ".idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}"
@@ -102,7 +102,7 @@ jobs:
       # As immutable install will not change cache only save new cache if not hit
       # Uses fine-grained methods from https://github.com/actions/cache
       #############################################################################
-        - uses: actions/cache/restore@v4
+        - uses: actions/cache/restore@v5
           id: cache
           with:
             path: ./.yarn/cache
@@ -111,7 +111,7 @@ jobs:
               ${{ runner.os }}-node-modules-yarn-v1-
         - name: Install node modules
           run: yarn install --immutable
-        - uses: actions/cache/save@v4
+        - uses: actions/cache/save@v5
           if: steps.cache.outputs.cache-hit != 'true'
           with:
             path: ./.yarn/cache
@@ -124,7 +124,7 @@ jobs:
           run: yarn build ${{inputs.BUILD_FLAGS}}
   
         - name: Upload artifact
-          uses: actions/upload-pages-artifact@v3
+          uses: actions/upload-pages-artifact@v5
           with:
             path: "www/"
             name: www  

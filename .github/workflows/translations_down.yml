@@ -64,21 +64,21 @@ jobs:
       steps:
 
       - name: Check translation repo   
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           repository: ${{inputs.TRANSLATION_REPO}}
           path: "translation_repo"
           ref: "main"
 
       - name: Check idems_translation
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           repository: "IDEMSInternational/idems_translation.git"
           path: "idems_translation"
           ref: "master"
 
       - name: set up python enviroment
-        uses: actions/setup-python@v5.0.0        
+        uses: actions/setup-python@v6        
         with:
           python-version: '3.12'
 
@@ -90,7 +90,7 @@ jobs:
         run: ls -l
   
       - name: Check out app code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: "IDEMSInternational/open-app-builder.git"
           ref: ${{inputs.APP_CODE_BRANCH}}
@@ -106,7 +106,7 @@ jobs:
         
       - name: Checkout parent repo if needed
         if: inputs.PARENT_DEPLOYMENT_REPO != ''
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: "open-app-builder/.idems_app/deployments/${{inputs.PARENT_DEPLOYMENT_NAME}}"
           repository: ${{inputs.PARENT_DEPLOYMENT_REPO}}
@@ -115,7 +115,7 @@ jobs:
           lfs: false
 
       - name: Checkout deployment
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT }}
           path: "open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}"
@@ -162,7 +162,7 @@ jobs:
       # As immutable install will not change cache only save new cache if not hit
       # Uses fine-grained methods from https://github.com/actions/cache
       #############################################################################
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@v5
         id: cache
         with:
           path: open-app-builder/.yarn/cache
@@ -174,7 +174,7 @@ jobs:
         working-directory: open-app-builder
         run: yarn install --immutable
 
-      - uses: actions/cache/save@v4
+      - uses: actions/cache/save@v5
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           path: open-app-builder/.yarn/cache
@@ -216,7 +216,7 @@ jobs:
         run: git remote -v
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7.0.5
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.PAT }}
           # Relative path under $GITHUB_WORKSPACE to the repository. Defaults to $GITHUB_WORKSPACE.

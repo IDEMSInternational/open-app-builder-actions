@@ -58,7 +58,7 @@ jobs:
       TRANSLATION_REPO: ${{ steps.export_vars.outputs.TRANSLATION_REPO }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Code branch used
         run: |
