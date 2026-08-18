@@ -48,7 +48,7 @@ jobs:
     steps:
 
     - name: Check translation repo   
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
       with:
         token: ${{ secrets.PAT }}
         repository: ${{inputs.TRANSLATION_REPO}}
@@ -56,14 +56,14 @@ jobs:
         ref: "main"
 
     - name: Check idems_translation
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
       with:
         repository: "IDEMSInternational/idems_translation.git"
         path: "idems_translation"
         ref: "master"
 
     - name: set up python enviroment
-      uses: actions/setup-python@v5.0.0        
+      uses: actions/setup-python@v6        
       with:
         python-version: '3.12'
 
@@ -75,7 +75,7 @@ jobs:
       run: ls -l
 
     - name: Check out app code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
       with:
         repository: "IDEMSInternational/open-app-builder.git"
         ref: ${{inputs.APP_CODE_BRANCH}}
@@ -84,14 +84,14 @@ jobs:
 
     - name: Checkout parent repo if needed
       if: inputs.PARENT_DEPLOYMENT_REPO != ''
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
       with:
         path: "open-app-builder/.idems_app/deployments/${{inputs.PARENT_DEPLOYMENT_NAME}}"
         repository: ${{inputs.PARENT_DEPLOYMENT_REPO}}
         ref: ${{inputs.PARENT_DEPLOYMENT_BRANCH}}
 
     - name: Checkout deployment
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
       with:          
         path: "open-app-builder/.idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}"
 
@@ -116,7 +116,7 @@ jobs:
         #  git checkout -b automated-changes
 
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v5.0.2
+      uses: peter-evans/create-pull-request@v8
       with:
         token: ${{ secrets.PAT }}
         # Relative path under $GITHUB_WORKSPACE to the repository. Defaults to $GITHUB_WORKSPACE.
