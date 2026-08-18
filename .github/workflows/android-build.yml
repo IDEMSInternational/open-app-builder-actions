@@ -93,7 +93,9 @@ jobs:
         - name: Checkout deployment
           uses: actions/checkout@v5
           with:
+            ref: ${{inputs.CONTENT_BRANCH}}
             path: ".idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}"
+            lfs: ${{inputs.LFS_USED}}
 
         - name: Populate Encryption key
           if: inputs.ENCRYPTED != ''
