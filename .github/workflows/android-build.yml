@@ -93,7 +93,14 @@ jobs:
         - name: Checkout deployment
           uses: actions/checkout@v5
           with:
+            # Match app-build.yml: without this the android job builds assets and config
+            # from the content repo's default branch while the web build uses CONTENT_BRANCH.
+            ref: ${{inputs.CONTENT_BRANCH}}
             path: ".idems_app/deployments/${{inputs.DEPLOYMENT_NAME}}"
+            # Deployment assets (splash/icon) are commonly stored in lfs, and the
+            # `yarn workflow android` asset generation step reads them directly. Without
+            # this they arrive as pointer files and image processing fails.
+            lfs: ${{inputs.LFS_USED}}
 
         - name: Populate Encryption key
           if: inputs.ENCRYPTED != ''
