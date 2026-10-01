@@ -110,6 +110,7 @@ Store the following **variables** and **secrets** in your deployment repo.
 | `APP_STORE_CONNECT_API_ISSUER_ID`   | Issuer ID from App Store Connect |
 | `APP_STORE_CONNECT_API_KEY`         | Contents of the `.p8` key file |
 | `APPETIZE_TOKEN`                    | API token if deploying to Appetize |
+| `GOOGLE_SERVICES_PLIST`             | Contents of GoogleService-Info.plist file for corresponding registered app in Firebase |
 
 ---
 
