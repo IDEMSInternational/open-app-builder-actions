@@ -7,6 +7,7 @@ It covers:
 - Google Cloud setup (bucket + service account)  
 - App Store Connect API keys  
 - GitHub secrets and variables  
+- Registering a new app with Apple (first TestFlight release only)  
 - How to trigger the workflow  
 - How to verify credentials in Google Cloud Storage  
 
@@ -114,7 +115,36 @@ Store the following **variables** and **secrets** in your deployment repo.
 
 ---
 
-## 6. Create a Workflow to Trigger the Reusable Action
+## 6. Register a New App with Apple
+
+Before the **first TestFlight release** of a new app, it must be registered manually with Apple. Fastlane Match can create certificates and provisioning profiles, but not App IDs or App Store Connect app records, and Apple's API cannot enable every capability the app uses. This is only needed once per app, and is not needed for Appetize.
+
+The bundle ID is `ios.app_id` in the deployment config (e.g. `international.idems.my-app`). iOS bundle IDs cannot contain underscores.
+
+### Register the App ID
+
+1. Go to [Certificates, Identifiers & Profiles → Identifiers](https://developer.apple.com/account/resources/identifiers/list) and click **+**
+2. Select **App IDs**, then type **App**
+3. Enter a description (e.g. the app name) and select **Explicit** Bundle ID, entering the `ios.app_id` value
+4. Under **Capabilities**, enable the capabilities listed in `ios/App/App/App.entitlements`. Currently these are:
+   - **Push Notifications**
+   - **Sign in with Apple** (enable as a primary App ID)
+   - **App Attest**
+5. Click **Continue**, then **Register**
+
+### Create the App Store Connect app
+
+1. In [App Store Connect](https://appstoreconnect.apple.com/apps), go to **Apps → + → New App**
+2. Select **iOS** as the platform, and enter the app name, primary language and SKU (can be anything, but by convention use the bundle ID, e.g. `international.idems.my-app`)
+3. Select the bundle ID registered above, then click **Create**
+
+The first TestFlight release must then be run with `allow_provisioning_changes=true` so that Fastlane Match creates the provisioning profile (see below).
+
+ℹ️ If capabilities are enabled on an existing App ID later (e.g. after a change to `App.entitlements`), run a release with `allow_provisioning_changes=true` so the provisioning profile is regenerated to include them.
+
+---
+
+## 7. Create a Workflow to Trigger the Reusable Action
 
 In your deployment repo, create a workflow file (e.g. `.github/workflows/ios-release.yml`):
 
@@ -154,11 +184,11 @@ jobs:
 
 ---
 
-## 7. Run the Reusable Workflow
+## 8. Run the Reusable Workflow
 
 Trigger the workflow manually from the deployment repo.  
 Choose either `appetize` or `testflight` as the target.
-Leave `allow_provisioning_changes` set to `false` for repeatable readonly signing, unless you intentionally need Fastlane Match to create or update provisioning profiles.
+Leave `allow_provisioning_changes` set to `false` for repeatable readonly signing, unless you intentionally need Fastlane Match to create or update provisioning profiles (e.g. on the first TestFlight release of a new app, after completing [step 6](#6-register-a-new-app-with-apple)).
 
 - `appetize` → builds an unsigned simulator `.app` and uploads to Appetize.io  
 - `testflight` → builds a signed `.ipa` and uploads to TestFlight  
@@ -166,7 +196,7 @@ Leave `allow_provisioning_changes` set to `false` for repeatable readonly signin
 
 ---
 
-## 8. Verify in GCS
+## 9. Verify in GCS
 
 If deploying to **TestFlight**, Fastlane Match will populate credentials in your GCS bucket:
 
