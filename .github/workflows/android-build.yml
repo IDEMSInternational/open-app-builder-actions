@@ -73,7 +73,7 @@ jobs:
       runs-on: ubuntu-latest
       needs: build_action
       env:
-        GIT_SHA: ${{ needs.web_build.outputs.GIT_SHA }}
+        GIT_SHA: ${{ needs.build_action.outputs.GIT_SHA }}
       steps:
         
         - name: Check out app code
